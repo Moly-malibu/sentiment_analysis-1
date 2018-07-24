@@ -1,4 +1,4 @@
-PRAGMA encoding="UTF-8";
+PRAGMA encoding="UTF-8"; 
 CREATE TABLE IF NOT EXISTS tweet_log (
   tweet_log_id INTEGER PRIMARY KEY AUTOINCREMENT,
   query text DEFAULT NULL,
@@ -32,5 +32,5 @@ CREATE TABLE IF NOT EXISTS tweet (
   created_at datetime NOT NULL,
   geo_lat real DEFAULT NULL,
   geo_long real DEFAULT NULL,
-  user_id_text text NOT NULL,
+  user_id_text text NOT NULL
 );

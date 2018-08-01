@@ -21,7 +21,7 @@ with open("Credentials/twitter_credentials.json", "r") as file:
     creds = json.load(file)
 
 # Coordinates of berlin
-lon, lat, R =13.404954, 52.520008, 50.0
+lon, lat, R =-0.076132, 51.508530, 50.0
 geo_locations = gps.bounding_square_coordinates(lon,lat,R)
 
 # Instantiate from our streaming class

@@ -63,16 +63,24 @@ class MyStreamer(TwythonStreamer):
 			'''
 			cursor.execute(usr_query,tweet[1])
 			
-		tweet_query='''
-		INSERT INTO tweet(tweet_id_text,tweet_hashtag,tweet_text,created_at,
-		geo_lat, geo_long, user_id_text) VALUES (?,?,?,?,?,?,?)
+		# We ask the database if the given tweet_id_text already exists
+		query ='''
+		SELECT count(*) FROM tweet WHERE tweet_id_text=?
 		'''
-		cursor.execute(tweet_query,tweet[0])
+		cursor.execute(query, (tweet_id_text,))
+				
+		# Save the User Data, if the user is Unique
+		if cursor.fetchone()[0] == 0:
+			tweet_query='''
+			INSERT INTO tweet(tweet_id_text,tweet_hashtag,tweet_text,created_at,
+			geo_lat, geo_long, user_id_text) VALUES (?,?,?,?,?,?,?)
+			'''
+			cursor.execute(tweet_query,tweet[0])
 			
-		log_query='''
-		INSERT INTO tweet_log(tweet_id_text,query,geo_lat,geo_long,radius,timestamp_at) VALUES (?,?,?,?,?,?)
-		'''
-		cursor.execute(log_query, query_data)
+			log_query='''
+			INSERT INTO tweet_log(tweet_id_text,query,geo_lat,geo_long,radius,timestamp_at) VALUES (?,?,?,?,?,?)
+			'''
+			cursor.execute(log_query, query_data)
 		
 		# Commit the data to the file
 		conn.commit()

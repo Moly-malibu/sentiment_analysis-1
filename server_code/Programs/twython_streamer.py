@@ -18,6 +18,8 @@ class MyStreamer(TwythonStreamer):
 	# Received data
 	def on_success(self, data):
 		
+		print('lang',data['lang'])
+		
 		if(data['lang'] != None):
 			# Only collect tweets in English
 			

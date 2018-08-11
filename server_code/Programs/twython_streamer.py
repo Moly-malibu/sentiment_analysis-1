@@ -17,18 +17,18 @@ class MyStreamer(TwythonStreamer):
 
 	# Received data
 	def on_success(self, data):
-		
-		print('lang',data['lang'])
-		
-		if(data['lang'] != None):
-			# Only collect tweets in English
-			
+
+		# Only collect tweets in English
+		try:
 			if data['lang'] == 'en':
 				tweet_data = process_tweet(data)
 				tweet_id_text =  data['id_str']
 				user_id = data['user']['id_str']
 				time_stamp = data['created_at']
 				self.save_to_sql(tweet_data, tweet_id_text, user_id, time_stamp)
+		except:
+			print("Unexpected error:", sys.exc_info()[0])
+			pass
 
 	# Problem with the API
 	def on_error(self, status_code, data):
@@ -67,24 +67,16 @@ class MyStreamer(TwythonStreamer):
 			'''
 			cursor.execute(usr_query,tweet[1])
 			
-		# We ask the database if the given tweet_id_text already exists
-		query ='''
-		SELECT count(*) FROM tweet WHERE tweet_id_text=?
+		tweet_query='''
+		INSERT INTO tweet(tweet_id_text,tweet_hashtag,tweet_text,created_at,
+		geo_lat, geo_long, user_id_text) VALUES (?,?,?,?,?,?,?)
 		'''
-		cursor.execute(query, (tweet_id_text,))
-				
-		# Save the User Data, if the user is Unique
-		if cursor.fetchone()[0] == 0:
-			tweet_query='''
-			INSERT INTO tweet(tweet_id_text,tweet_hashtag,tweet_text,created_at,
-			geo_lat, geo_long, user_id_text) VALUES (?,?,?,?,?,?,?)
-			'''
-			cursor.execute(tweet_query,tweet[0])
+		cursor.execute(tweet_query,tweet[0])
 			
-			log_query='''
-			INSERT INTO tweet_log(tweet_id_text,query,geo_lat,geo_long,radius,timestamp_at) VALUES (?,?,?,?,?,?)
-			'''
-			cursor.execute(log_query, query_data)
+		log_query='''
+		INSERT INTO tweet_log(tweet_id_text,query,geo_lat,geo_long,radius,timestamp_at) VALUES (?,?,?,?,?,?)
+		'''
+		cursor.execute(log_query, query_data)
 		
 		# Commit the data to the file
 		conn.commit()

@@ -27,7 +27,7 @@ class MyStreamer(TwythonStreamer):
 				time_stamp = data['created_at']
 				self.save_to_sql(tweet_data, tweet_id_text, user_id, time_stamp)
 		except:
-			print("Unexpected error:", sys.exc_info()[0])
+			#print("Unexpected error:", sys.exc_info()[0])
 			pass
 
 	# Problem with the API

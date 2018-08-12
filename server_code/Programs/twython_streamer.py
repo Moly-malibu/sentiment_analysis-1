@@ -1,5 +1,5 @@
 from twython import TwythonStreamer  
-import sys
+
 
 # Create a class that inherits TwythonStreamer
 # The class constructor has been overidden so it can have extra properties
@@ -25,7 +25,6 @@ class MyStreamer(TwythonStreamer):
 			user_id = data['user']['id_str']
 			time_stamp = data['created_at']
 			self.save_to_sql(tweet_data, tweet_id_text, user_id, time_stamp)
-
 
 	# Problem with the API
 	def on_error(self, status_code, data):
@@ -64,7 +63,13 @@ class MyStreamer(TwythonStreamer):
 			'''
 			cursor.execute(usr_query,tweet[1])
 			
-				# Save the User Data, if the user is Unique
+		# We ask the database if the given tweet_id_text already exists
+		query ='''
+		SELECT count(*) FROM tweet WHERE tweet_id_text=?
+		'''
+		cursor.execute(query, (tweet_id_text,))
+				
+		# Save the User Data, if the user is Unique
 		if cursor.fetchone()[0] == 0:
 			tweet_query='''
 			INSERT INTO tweet(tweet_id_text,tweet_hashtag,tweet_text,created_at,
@@ -76,7 +81,7 @@ class MyStreamer(TwythonStreamer):
 			INSERT INTO tweet_log(tweet_id_text,query,geo_lat,geo_long,radius,timestamp_at) VALUES (?,?,?,?,?,?)
 			'''
 			cursor.execute(log_query, query_data)
-				
+		
 		# Commit the data to the file
 		conn.commit()
 		

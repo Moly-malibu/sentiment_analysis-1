@@ -1,5 +1,5 @@
 from twython import TwythonStreamer  
-
+import sys
 
 # Create a class that inherits TwythonStreamer
 # The class constructor has been overidden so it can have extra properties
@@ -67,17 +67,19 @@ class MyStreamer(TwythonStreamer):
 			'''
 			cursor.execute(usr_query,tweet[1])
 			
-		tweet_query='''
-		INSERT INTO tweet(tweet_id_text,tweet_hashtag,tweet_text,created_at,
-		geo_lat, geo_long, user_id_text) VALUES (?,?,?,?,?,?,?)
-		'''
-		cursor.execute(tweet_query,tweet[0])
+				# Save the User Data, if the user is Unique
+		if cursor.fetchone()[0] == 0:
+			tweet_query='''
+			INSERT INTO tweet(tweet_id_text,tweet_hashtag,tweet_text,created_at,
+			geo_lat, geo_long, user_id_text) VALUES (?,?,?,?,?,?,?)
+			'''
+			cursor.execute(tweet_query,tweet[0])
 			
-		log_query='''
-		INSERT INTO tweet_log(tweet_id_text,query,geo_lat,geo_long,radius,timestamp_at) VALUES (?,?,?,?,?,?)
-		'''
-		cursor.execute(log_query, query_data)
-		
+			log_query='''
+			INSERT INTO tweet_log(tweet_id_text,query,geo_lat,geo_long,radius,timestamp_at) VALUES (?,?,?,?,?,?)
+			'''
+			cursor.execute(log_query, query_data)
+				
 		# Commit the data to the file
 		conn.commit()
 		

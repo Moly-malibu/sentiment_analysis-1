@@ -19,16 +19,13 @@ class MyStreamer(TwythonStreamer):
 	def on_success(self, data):
 
 		# Only collect tweets in English
-		try:
-			if data['lang'] == 'en':
-				tweet_data = process_tweet(data)
-				tweet_id_text =  data['id_str']
-				user_id = data['user']['id_str']
-				time_stamp = data['created_at']
-				self.save_to_sql(tweet_data, tweet_id_text, user_id, time_stamp)
-		except:
-			#print("Unexpected error:", sys.exc_info()[0])
-			pass
+		if data['lang'] == 'en':
+			tweet_data = process_tweet(data)
+			tweet_id_text =  data['id_str']
+			user_id = data['user']['id_str']
+			time_stamp = data['created_at']
+			self.save_to_sql(tweet_data, tweet_id_text, user_id, time_stamp)
+
 
 	# Problem with the API
 	def on_error(self, status_code, data):

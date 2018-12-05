@@ -28,7 +28,16 @@ geo_locations = gps.bounding_square_coordinates(lon,lat,R)
 stream = streamer.MyStreamer(conn,creds['CONSUMER_KEY'], creds['CONSUMER_SECRET'],  
                     creds['ACCESS_TOKEN_KEY'], creds['ACCESS_TOKEN_SECRET'],
                    long=lon,lat=lat,Radius=R)
-# Start the stream
-stream.statuses.filter(locations=geo_locations)  
 
 print("--------location based listener started--------")
+
+# Start the stream, this fix was suggested from the following github page:
+# https://github.com/ryanmcgrath/twython/issues/288 
+while True:
+	try:
+		stream.statuses.filter(locations=geo_locations)  
+	except:
+		e = sys.exc_info()[0]
+		print("error",e)
+		continue
+

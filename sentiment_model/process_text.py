@@ -12,6 +12,7 @@ from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import sent_tokenize, word_tokenize
 from collections import Counter 
 import spacy
+from textblob import TextBlob
 
 
 # Load the pre-built word embedding model
@@ -134,4 +135,44 @@ def string_cohesion(vec):
 	
 	return s
 
-
+def sentiment_model(text,threshold,vectorizer, loaded_model1,loaded_model2):
+    
+    s = str(clean_up_text(text))
+    
+    X0 = vectorizer.transform([s])
+    
+    preds_nb = loaded_model1.predict(X0)
+    preds_lr = loaded_model2.predict(X0)
+    preds_blob =  TextBlob(text).sentiment.polarity
+    
+    if(preds_blob>=0.0):
+        preds_blob = +1
+    else:
+        preds_blob = -1
+        
+    indx_nb= int((preds_nb[0]+1)/2)
+    indx_lr= int((preds_lr[0]+1)/2)
+    prob_nb = abs((loaded_model1.predict_proba(X0)[0][indx_nb]-.50)*2.0*int(preds_nb[0]))
+    prob_lr = abs((loaded_model2.predict_proba(X0)[0][indx_lr]-0.50)*2.0*int(preds_lr[0]))
+    prob_blob = abs(TextBlob(text).sentiment.polarity) # [-1,1]
+    
+    
+    if(prob_lr<threshold):
+        preds_lr=[0.0]
+        
+    if(prob_nb<threshold):
+        preds_nb=[0.0]
+        
+    if(prob_blob<threshold):
+        preds_blob =0.0
+        
+        
+    # choose the most likely model
+    predictions = [preds_nb[0],preds_lr[0],preds_blob]
+    predict_prob = [prob_nb,prob_lr,prob_blob]
+    
+    pred = predictions[np.argmax(predict_prob)]
+    prob = np.max(predict_prob)
+    
+    
+    return pred,prob

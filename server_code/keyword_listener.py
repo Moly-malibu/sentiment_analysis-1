@@ -4,6 +4,7 @@ import sqlite3
 import json
 import Programs.gps_geometry as gps
 import Programs.twython_streamer as streamer
+import sys
 
 # Connect to the database
 conn = sqlite3.connect("Databases/keyword_based_database.db")
@@ -25,7 +26,16 @@ with open("Credentials/twitter_credentials.json", "r") as file:
 stream = streamer.MyStreamer(conn,creds['CONSUMER_KEY'], creds['CONSUMER_SECRET'],  
                     creds['ACCESS_TOKEN_KEY'], creds['ACCESS_TOKEN_SECRET'],
                    queryText=trackstring)
-# Start the stream
-stream.statuses.filter(track=trackstring)  
 
-print("--------Keyword based listener started--------")
+
+print("--------Keyword based listener starting--------")
+
+# Start the stream, this fix was suggested from the following github page:
+# https://github.com/ryanmcgrath/twython/issues/288 
+while True:
+	try:
+		stream.statuses.filter(track=trackstring)  
+	except:
+		e = sys.exc_info()[0]
+		print("error",e)
+		continue

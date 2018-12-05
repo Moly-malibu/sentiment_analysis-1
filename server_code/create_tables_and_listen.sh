@@ -13,5 +13,5 @@ EOF
 
 echo "beginning python scripts"
 #python location_listener.py &
-#python keyword_listener.py &
+python keyword_listener.py &
 

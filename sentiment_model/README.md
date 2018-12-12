@@ -23,7 +23,10 @@ create a vocabulary of the most frequently used words.
 # 3. 3_final_analysis
 * This Jupyter notebook will read in, process all tweets and compute the sentiment of all car brands using the SQL queries and models that
 were trained previously.
+* This is carried out over all elements in the database
 
+# 4. 4_final_analysis_time_series
+* This jupyter notebook computes the sentiments for a specific car brand for a set of specific days.
 
 
 # Data Sources:

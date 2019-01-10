@@ -5,6 +5,11 @@ This repository carries out sentiment analysis on website review data from diffe
 
 ## Contents
 
-### 1. [Sentiment analysis model]()  
+### 1. [Sentiment analysis model](sentiment_model/)  
 This model was trained using a combination of Amazon customer review data along with Yelp review data.
-The final chosen model was a Naive Bayes Classifier. 
+The final chosen model was a Naive Bayes Classifier.
+
+
+### 2. [Twitter Data Collector Code](server_code/)
+This folder contains all of the code required to run the Twitter data listener and collect 
+the twitter data as a SQL database 

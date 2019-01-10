@@ -6,6 +6,20 @@ This repository carries out sentiment analysis on website review data from diffe
 This code was written for a sentiment analysis model for [__APIthinking__](https://www.apithinking.de/en/).
 
 
+# Requirements
+
+To export environment file
+
+activate <environment-name>
+```
+$conda env export > <environment-name>.yml
+```
+
+For other person to use the environment
+```
+$conda env create -f <environment-name>.yml
+```
+
 ## Contents
 
 ### 1. [Sentiment analysis model](sentiment_model/)  

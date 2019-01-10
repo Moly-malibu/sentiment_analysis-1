@@ -31,12 +31,18 @@ stream = streamer.MyStreamer(conn,creds['CONSUMER_KEY'], creds['CONSUMER_SECRET'
 
 print("--------Keyword based listener starting--------")
 
+# Write to log file
+t0 = time.time()
+
 # Start the stream, this fix was suggested from the following github page:
 # https://github.com/ryanmcgrath/twython/issues/288 
 while True:
 	try:
+		t1 = time.time()
+		line = str(t1-t0)+' Program Running'+'\n'
 		stream.statuses.filter(track=trackstring)  
 	except:
+		t2 = time.time()
 		e = sys.exc_info()[0]
 		print("error",e)
 		time.sleep(20.0)

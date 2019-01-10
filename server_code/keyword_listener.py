@@ -1,4 +1,5 @@
 import numpy as np
+import time
 import csv
 import sqlite3
 import json
@@ -38,4 +39,5 @@ while True:
 	except:
 		e = sys.exc_info()[0]
 		print("error",e)
+		time.sleep(20.0)
 		continue

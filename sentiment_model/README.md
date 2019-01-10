@@ -26,8 +26,11 @@ were trained previously.
 * This is carried out over all elements in the database
 
 # 4_final_analysis_time_series
-* This jupyter notebook computes the sentiments for a specific car brand for a set of specific days.
-* A scatter-plot is generated based on the data
+* This jupyter notebook computes the sentiments for all car brands for a set of specific days.
+* A time series scatter-plot is generated based on the data
+
+# 5_time_series_comparisons
+* This jupyter notebook generates plots of all car brands 
 
 
 # Data Sources:

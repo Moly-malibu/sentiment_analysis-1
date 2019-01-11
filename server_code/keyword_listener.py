@@ -44,6 +44,7 @@ while True:
 		stream.statuses.filter(track=trackstring)  
 	except:
 		print('Attempting to reconnect: \n')
+		print('Wait time: ', 20.0+10.0*attempt)
 		t2 = time.time()
 		e = sys.exc_info()[0]
 		print("error",e)

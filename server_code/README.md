@@ -14,6 +14,13 @@ In the __Credentials__ folder, make sure that you have a .json file with the fol
 }
 ```
 
+## Conda installation
+
+```
+$  wget https://repo.continuum.io/archive/Anaconda3-2018.12-Linux-x86_64.sh  
+$ bash Anaconda3-2018.12-Linux-x86_64.sh
+```
+
 ## Getting Started
 
 To create the data bases and run the python code run:

@@ -1,8 +1,10 @@
 # Twitter Data Streamer Collector
 
 This folder contains all of the code that is used in order to stream and collect tweets,
-either by keywords, or by a specific location.
+either by keywords or by a specific location.
 
+
+## Access Tokens
 In the __Credentials__ folder, make sure that you have a .json file with the following information:
 
 ```
@@ -16,6 +18,7 @@ In the __Credentials__ folder, make sure that you have a .json file with the fol
 
 ## Conda installation
 
+Choose the version of Anaconda that you wish to download,
 ```
 $  wget https://repo.continuum.io/archive/Anaconda3-2018.12-Linux-x86_64.sh  
 $ bash Anaconda3-2018.12-Linux-x86_64.sh
@@ -26,7 +29,7 @@ $ bash Anaconda3-2018.12-Linux-x86_64.sh
 To create the data bases and run the python code run:
 
 ```
-$ bash  create_tables_and_listen.sh
+$ nohup create_tables_and_listen.sh &
 ```
 
 The sql databases will be stored in the folder __Databases__, as

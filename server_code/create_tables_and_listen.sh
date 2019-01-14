@@ -13,5 +13,9 @@ EOF
 
 echo "beginning python scripts"
 #python location_listener.py &
-python keyword_listener.py &
 
+# Run program again if it crashes 
+until keyword_listener.py; do
+    echo "'keyword_listener.py' crashed with exit code $?. Restarting..." >&2
+    sleep 1
+done

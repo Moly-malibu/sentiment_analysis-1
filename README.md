@@ -6,6 +6,7 @@ This repository carries out sentiment analysis on website review data from diffe
 This code was written for a sentiment analysis model for [__APIthinking__](https://www.apithinking.de/en/).
 
 <img src="ApiThinking_RGB_black.png"
+     href = "https://www.apithinking.de/en/"
      alt="ApiThinking icon"
      style="float: left; margin-right: 10px;" />
 
@@ -21,7 +22,7 @@ $ bash Anaconda3-2018.12-Linux-x86_64.sh
 
 ### 2. Create Conda enviroment
 After conda has been installed. The enviroment to run the code needs to be created. The enviroment that is used
-for this program is found in __py35.yml__. To load this enviroment:  
+for this program is found in __py35.yml__. To create this enviroment:  
 
 ```
 $ conda env create -f py35.yml

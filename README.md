@@ -17,6 +17,7 @@ Choose the version of Anaconda that you wish to download, for example
 ```
 $  wget https://repo.continuum.io/archive/Anaconda3-2018.12-Linux-x86_64.sh  
 $ bash Anaconda3-2018.12-Linux-x86_64.sh
+```
 
 ### 2. Create Conda enviroment
 After conda has been installed. The enviroment to run the code needs to be created. The enviroment that is used

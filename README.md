@@ -5,6 +5,10 @@ This repository carries out sentiment analysis on website review data from diffe
 
 This code was written for a sentiment analysis model for [__APIthinking__](https://www.apithinking.de/en/).
 
+<img src="ApiThinking_RGB_black.png"
+     alt="ApiThinking icon"
+     style="float: left; margin-right: 10px;" />
+
 
 # Requirements
 

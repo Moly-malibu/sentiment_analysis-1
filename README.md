@@ -35,6 +35,12 @@ To run the conda envioment that was created,
 $ source activate py35
 ```
 
+It may be necessary to download Spacys word embedding model,  
+
+```
+python -m spacy download en_core_web_lg
+```
+
 ### 4. Export changes to conda enviroment  
 If you have made changes to the enviroment needed to run the code in the repository, export the enviroment using,  
 ```

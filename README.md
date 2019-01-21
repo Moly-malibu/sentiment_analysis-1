@@ -3,7 +3,7 @@
 This repository carries out sentiment analysis on website review data from different sources. Please look at the main [Jupyter notebook](Review_Analysis.ipynb) 
 
 
-This code was written for a sentiment analysis model for [__APIthinking__](https://www.apithinking.de/en/).
+This code was written for a sentiment analysis model for [__ApiThinking__](https://www.apithinking.de/en/).
 
 <img src="ApiThinking_RGB_black.png"
      href = "https://www.apithinking.de/en/"

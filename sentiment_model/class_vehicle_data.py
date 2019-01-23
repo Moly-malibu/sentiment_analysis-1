@@ -120,6 +120,11 @@ class Vehicle_data:
 			if(neu==-1):
 				self.car_data["Daily_neu_percent"][i] = mean_neu
 	
+	
+	def return_sentiment_data(self):
+
+		return self.car_data["Daily_pos_percent"],self.car_data["Daily_neg_percent"],self.car_data["Daily_neu_percent"]
+	
 	def scale_data_Ztransform(self):
 		
 		N = len(self.car_data["Dates"])

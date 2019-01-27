@@ -6,7 +6,7 @@ class Vehicle_data:
 	
 	def __init__(self):
 		"""
-		The constructor of the class
+		The constructor of the class for the vehicle data
 		"""
 		
 		
@@ -121,9 +121,39 @@ class Vehicle_data:
 				self.car_data["Daily_neu_percent"][i] = mean_neu
 	
 	
+	@staticmethod			
+	def fill_NA_array(array,data_NA=""):
+		"""
+		This function will will in NA values in an array with the mean of the array
+		"""
+		N = len(array)
+		mean_val = array[array != -1.0 ].mean()
+		
+		for i in range(N):
+			ai = array[i]
+			
+			if(ai==-1.0):
+				array[i]=mean_val
+		
+		return array
+	
+	
 	def return_sentiment_data(self):
 
 		return self.car_data["Daily_pos_percent"],self.car_data["Daily_neg_percent"],self.car_data["Daily_neu_percent"]
+		
+	def daily_sentiment_return(self):
+		"""
+		
+		"""
+		N = len(self.car_data["Dates"])
+		
+		daily_pos_return = (self.car_data["Daily_pos_percent"][1:]/self.car_data["Daily_pos_percent"][0:-1])-1.0
+		daily_neg_return = (self.car_data["Daily_neg_percent"][1:]/self.car_data["Daily_neg_percent"][0:-1])-1.0
+		daily_neu_return = (self.car_data["Daily_neu_percent"][1:]/self.car_data["Daily_neu_percent"][0:-1])-1.0
+		
+		
+		return daily_pos_return, daily_neg_return, daily_neu_return
 	
 	def scale_data_Ztransform(self):
 		
@@ -184,12 +214,51 @@ class Vehicle_data:
 		
 		return y_pos,y_neg,y_neu
 		
+	@staticmethod
+	def return_model_training_results_prob(file_name):
+		
+		prob_true_pos_T=[]
+		prob_false_pos_T=[]
+		prob_true_neg_T=[]
+		prob_false_neg_T=[] 
+		
+		T= []
+		Tp_N=[]
+		Tn_N=[]
+		Fp_N=[]
+		Fn_N=[]
+
+		f=open(file_name,mode="r")
+		f.readline()
 		
 		
+		for line in f:
+			tokens = line.split()
+			T.append(float(tokens[0]))
+			Tp_N.append(float(tokens[6]))
+			Fp_N.append(float(tokens[7]))
+			Tn_N.append(float(tokens[8]))
+			Fn_N.append(float(tokens[9]))
 			
+		prob_tp = np.zeros(len(T))
+		prob_fp = np.zeros(len(T))
+		prob_pos = np.zeros(len(T))
+		prob_tn = np.zeros(len(T))
+		prob_fn = np.zeros(len(T))
+		prob_neg =np.zeros(len(T))
+			
+		for k in range(len(T)):
+			# The probability of a positive or negative result
+			prob_pos[k] = (Tp_N[k]+Fn_N[k])/(Tp_N[k]+Fp_N[k]+Tn_N[k]+Fn_N[k])
+			prob_neg[k] = (Tn_N[k]+Fp_N[k])/(Tp_N[k]+Fp_N[k]+Tn_N[k]+Fn_N[k])
+			
+			prob_tp[k] = Tp_N[k]/(Tp_N[k]+Fp_N[k])
+			prob_fp[k] = Fp_N[k]/(Tp_N[k]+Fp_N[k])
+			
+			prob_tn[k] = Tn_N[k]/(Tn_N[k]+Fn_N[k])
+			prob_fn[k] = Fn_N[k]/(Tn_N[k]+Fn_N[k])
+			
+					
 		
-		
-		
-		
-		
+		return T, prob_tp,prob_fp, prob_tn,prob_fn, prob_pos, prob_neg
 	

@@ -1,0 +1,30 @@
+# Model Training Parmeters:
+model_training: True
+
+
+# SQL vehicle brand queries:
+'queries/BMW.txt'
+'queries/Toyota.txt'
+'queries/Mercedes.txt'
+'queries/Porsche.txt'
+'queries/Ford.txt'
+'queries/Tesla.txt'
+
+# Dates to calculate:
+'%Aug 01 %'
+'%Aug 02 %'
+'%Aug 03 %'
+'%Aug 04 %'
+'%Aug 05 %'
+'%Aug 06 %'
+'%Aug 07 %'
+'%Aug 08 %'
+'%Aug 09 %'
+
+# Model Threshold calculations for Bayesian Weighing:
+Ti,Tf,dt: 0.0,1.0,0.1
+
+# Bayesian Correlation Analysis
+scale_0: 1.0e-3
+Sentiment_model_normalization: Z-transform
+Priors_min, Prior_max: -100, 100

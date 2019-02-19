@@ -1,0 +1,18 @@
+SELECT * FROM tweet
+WHERE LOWER(tweet_text) LIKE '%ford%'
+AND LOWER(tweet_text) NOT LIKE '%harrison%'  
+AND LOWER(tweet_text) NOT LIKE '%vote%'  
+AND LOWER(tweet_text) NOT LIKE '%doug%'
+AND LOWER(tweet_text) NOT LIKE '%tom%'
+AND LOWER(tweet_text) NOT LIKE '%henry%'
+AND LOWER(tweet_text) NOT LIKE '%government%'
+AND LOWER(tweet_text) NOT LIKE '%goverment%'
+AND LOWER(tweet_text) NOT LIKE '%tax%'
+AND LOWER(tweet_text) NOT LIKE '%toronto%'
+AND LOWER(tweet_text) NOT LIKE '%democrats%'
+AND LOWER(tweet_text) NOT LIKE '%ontario%'
+AND LOWER(tweet_text) NOT LIKE '%fordnation%'
+AND LOWER(tweet_text) NOT LIKE '%premier%'
+AND LOWER(tweet_text) NOT LIKE '%melissa%'
+AND created_at LIKE '%Aug 03 %' 
+ 

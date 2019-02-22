@@ -9,6 +9,7 @@ import os
 import sqlite3
 import pandas as pd
 import numpy as np
+from tqdm import tqdm
 import matplotlib
 import matplotlib.pyplot as plt
 from source.read_input import  *
@@ -63,6 +64,7 @@ def generate_sentiment_time_series(time_stamps,car_companies,thresholds,database
 	
 	x_labels = [time_stamps[k].replace("%", "").replace("'","") for k in range(1,len(time_stamps))]
 	print('Time Stamps: ', x_labels)
+	print('Number of Dates: ', len(x_labels),'\n')
 	
 	# Now we make the new folders in our current directoy
 	for threshold in thresholds:
@@ -92,15 +94,10 @@ def generate_sentiment_time_series(time_stamps,car_companies,thresholds,database
 			daily_pos=[]
 			daily_neg=[]
 			
-			for date in time_stamps:
+			for date in tqdm(time_stamps):
 				
 				q_time = q + "AND created_at LIKE '"+ date +"' \n "
 				
-				#save_sql_query(q_time,output_q_name)
-				
-				print('\n')
-				print(q_time)
-				print('\n')
 				
 				df = pd.read_sql_query(q_time,conn)
 				N_raw_tweets = len(df)

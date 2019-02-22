@@ -51,7 +51,17 @@ if __name__ == "__main__":
 	N_mcmc_runs =data["N_mcmc_runs"]
 	N_correlation_samples = data["N_correlation_samples"]
 	
+	# This will scale the data according to desired transformation
+	sentiment_curve_scaling=data["Sentiment_Curve_Scaling"]["Transform"]
+	sentiment_scaling_Xmin =data["Sentiment_Curve_Scaling"]["Xmin"]
+	sentiment_scaling_Xmax = data["Sentiment_Curve_Scaling"]["Xmax"]
+	
+	remove_outliers=data["Remove_outliers"]
+	
+	pos_scale = data["X0_pos_scale"]
+	neg_scale = data["X0_neg_scale"]
+	
 	
 	for target_car in car_companies:
-		compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N_mcmc_burn,N_mcmc_walkers,N_mcmc_runs,N_correlation_samples)
+		compute_correlation_posteriors(pos_scale,neg_scale,sentiment_curve_scaling,sentiment_scaling_Xmin,sentiment_scaling_Xmax, remove_outliers,target_car,thresholds,N_conv_min,N_conv_max,N_mcmc_burn,N_mcmc_walkers,N_mcmc_runs,N_correlation_samples)
 	

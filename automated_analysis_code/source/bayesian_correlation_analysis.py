@@ -10,7 +10,7 @@ import scipy.optimize as op
 import corner
 
 
-def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N_mcmc_burn,N_mcmc_walkers,N_mcmc_runs,N_correlation_samples):
+def compute_correlation_posteriors(pos_scale,neg_scale,sentiment_curve_scaling,sentiment_scaling_Xmin,sentiment_scaling_Xmax, remove_outliers,target_car,thresholds,N_conv_min,N_conv_max,N_mcmc_burn,N_mcmc_walkers,N_mcmc_runs,N_correlation_samples):
 	'''
 	This code will generate the Bayesian correlations
 	'''
@@ -21,10 +21,8 @@ def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N
 	# Initialize all car data
 	all_cars = [Vehicle_data() for k in range(len(output))]
 	
-	b1_scale = 1.0e-3
-	b2_scale = 1.0e-3
-	b3_scale = 1.0
-	sigma_scale = 1.0
+	b1_scale = pos_scale#1.0e-3
+	b2_scale = neg_scale#1.0e-3
 	
 	# Create a new directoy for the target vehicle
 	new_folder="data/"+target_car
@@ -33,7 +31,10 @@ def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N
 		os.mkdir(new_folder)
 	except FileExistsError:
 		print('Directory: ', new_folder, ' already exists')
-		
+	
+	
+	plt.clf()
+	
 	# Read in all the data for a specific vehicle
 	for k in range(len(all_cars)):
 	    file = "data/"+output[k]+"/"+target_car+"_daily_data.txt"
@@ -46,7 +47,7 @@ def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N
 	    # Other transformations that are available
 	    #y_pos,y_neg,y_neu =car.scale_data_Ztransform()
 	    #y_pos,y_neg,y_neu =car.scale_data_MinMaxTransform(Xmin=-1,Xmax=1)
-	    
+	        
 	    plt.plot(car.car_data["Dates"],y_pos,"-o",label="T="+str(round(threshold,3)))
 	    
 	plt.title(target_car,size=20)
@@ -139,17 +140,28 @@ def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N
 	
 	# Lopp over all thresholds
 	for k in range(len(all_cars)):
-	    #y_pos,y_neg,y_neu =all_cars[k].return_sentiment_data()
-	    y_pos,y_neg,y_neu =all_cars[k].scale_data_Ztransform()
-	    #y_pos,y_neg,y_neu =all_cars[k].scale_data_MinMaxTransform(Xmin=-1,Xmax=1)
-	    #y_pos,y_neg,y_neu =all_cars[k].daily_sentiment_return()
+		#y_pos,y_neg,y_neu =all_cars[k].return_sentiment_data()
+		
+		if(sentiment_curve_scaling=='Z-transform'):
+			y_pos,y_neg,y_neu =all_cars[k].scale_data_Ztransform()
+		elif(sentiment_curve_scaling=='MinMax-transform'):
+			y_pos,y_neg,y_neu =all_cars[k].scale_data_MinMaxTransform(Xmin=sentiment_scaling_Xmin,Xmax=sentiment_scaling_Xmax)
+		
+		#y_pos,y_neg,y_neu =all_cars[k].scale_data_MinMaxTransform(Xmin=-1,Xmax=1)
+		#y_pos,y_neg,y_neu =all_cars[k].daily_sentiment_return()
+		
+		if(remove_outliers==True):
+			y_pos = car.remove_outliers(y_pos)
+			y_neg = car.remove_outliers(y_neg)
+			y_neu = car.remove_outliers(y_neu)
 	
-	    #y_pos_tot += prob_pos[k]*prob_tp[k]*y_pos
-	    y_tp += w_tp[k]*y_pos
-	    y_fp += w_fn[k]*y_pos
-	    
-	    y_tn += w_tn[k]*y_neg
-	    y_fn += w_fn[k]*y_neg
+		
+		#y_pos_tot += prob_pos[k]*prob_tp[k]*y_pos
+		y_tp += w_tp[k]*y_pos
+		y_fp += w_fn[k]*y_pos
+		
+		y_tn += w_tn[k]*y_neg
+		y_fn += w_fn[k]*y_neg
 	    
 	
 	# Scale the data to improve the sampling
@@ -164,6 +176,7 @@ def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N
 	plt.clf() 
 	plt.plot(dates,y_tp,label="True Positive signal",color="g")
 	plt.plot(dates,y_fp,label="False Positive signal",color="g",alpha=0.4)
+	plt.plot([], [], ' ', label="Scale: X_0="+str(b1_scale))
 	plt.ylabel("Normalized Positive Signal",size=15)
 	plt.xticks(rotation='vertical')
 	plt.xlabel("Dates",size=20)
@@ -173,6 +186,7 @@ def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N
 	plt.clf()
 	plt.plot(dates,y_tn,label="True Negative signal",color="r")
 	plt.plot(dates,y_fn,label="False Negative signal",color="r",alpha=0.4)
+	plt.plot([], [], ' ', label="Scale: X_0="+str(b2_scale))
 	plt.ylabel("Normalized Negative Signal",size=15)
 	plt.xticks(rotation='vertical')
 	plt.xlabel("Dates",size=20)
@@ -188,6 +202,7 @@ def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N
 	y_tp=y_tp[1:]
 	y_tn=y_tn[1:]
 	
+	# Return the Closing Price of the Target vehicle stock
 	y_target_car=np.asarray(data_target["Closing_Price"])
 	y_target_car=Vehicle_data().fill_NA_array(y_target_car)
 	    
@@ -200,10 +215,36 @@ def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N
 	daily_return_sp500=(y_sp500[1:]/y_sp500[0:-1])-1.0
 	
 	
+	# Remove the outliers in the Data
+	if(remove_outliers==True):
+		daily_return_target_car = car.remove_outliers(daily_return_target_car)
+		daily_return_sp500= car.remove_outliers(daily_return_sp500)
+	
+	#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	# Insert code to cheack that stock data has been read in correctly!
+	print(y_target_car[1:])
+	print(daily_return_target_car)
+	print(daily_return_sp500)
+	#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	
+	# Let us check that the dimensions all agree
+	if(len(y_tp) != len(daily_return_target_car)):
+		print('TP not the same length as Daily returns')
+		print('TP length: ', len(y_tp))
+		print('Daily Ret length: ',len(daily_return_target_car),'\n')
+		print('Last Date in Daily Ret: ', data_target["Dates"],'\n')
+		print('Last Date in S&P500 Ret: ', data_sp500["Dates"],'\n')
+		print('Last Date in Sentiment: ', all_cars[0].car_data["Dates"])
+		print('Program Exiting')
+		exit()
+	
+	
 	# Visualize the results
 	plt.clf()
 	plt.plot(y_tp,daily_return_target_car,"o",c="g",label="True Positive Sentiment")
 	plt.plot(y_tn,daily_return_target_car,"o",c="r",label="True Negative Sentiment")
+	plt.plot([], [], ' ', label="Scale: X_0(pos)="+str(b1_scale))
+	plt.plot([], [], ' ', label="Scale: X_0(neg)="+str(b2_scale))
 	plt.axvline(x=0, color='k')
 	plt.axhline(y=0, color='k')
 	plt.ylabel("Daily Returns "+target_car,size=20)
@@ -237,6 +278,12 @@ def compute_correlation_posteriors(target_car,thresholds,N_conv_min,N_conv_max,N
 	corr_ytrue_pos=[]
 	corr_ytrue_neg=[]
 	N_vals =[]
+	
+	# Here we test that the Nmax is not too large compared to available array dimensions
+	if(N_conv_max > len(daily_return_sp500)):
+		print('Specified Nmax is greater than Dim of Sentiment Array: ')
+		print('Changing Upper Bound')
+		N_conv_max = len(daily_return_sp500)
 	
 	
 	for N in range(N_conv_min,N_conv_max+1):
@@ -533,6 +580,7 @@ def fit_model(x1,x2,x3,y,N,N_mcmc_walkers,N_mcmc_runs,N_mcmc_burn,target_car,b1_
 
 	print("====================================================\n")
 	print("Parameter estimation for: "+ target_car+"\n")
+	print("The number of Data Points is : ", N,'\n')
 	
 	print("The 68% Confidence regions")
 	print("a_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(a_mcmc[0],a_mcmc[1],a_mcmc[2]))

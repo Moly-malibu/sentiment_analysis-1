@@ -137,6 +137,39 @@ class Vehicle_data:
 		
 		return array
 	
+	@staticmethod		
+	def remove_outliers(array):
+		'''
+		This function will remove the outliers in the data set if they are larger than 1.5 times the interquartile range
+		'''
+		
+		# Compute the median of the array
+		med = np.percentile(array, 50) 
+		
+		# Compute Q1 and Q3 of the array
+		q1 = np.percentile(array, 25) 
+		q3 = np.percentile(array, 75) 
+		
+		# Compute the IQR
+		iqr = np.abs(q3-q1)
+		
+		# Loop though the array and replace outliers with the median of the distribution
+		min_iqr = q1-1.5*iqr
+		max_iqr = q3+1.5*iqr
+		
+		for k in range(len(array)):
+			
+			ai = array[k]
+			
+			if(ai>max_iqr):
+				array[k]=med
+			
+			if(ai< min_iqr):
+				array[k]=med
+		
+		
+		return array
+	
 	
 	def return_sentiment_data(self):
 

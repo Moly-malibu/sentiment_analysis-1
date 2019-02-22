@@ -1,0 +1,3 @@
+SELECT * FROM tweet
+WHERE LOWER(tweet_text) LIKE '%tesla%'
+AND LOWER(tweet_text) NOT LIKE '%solar roof%'

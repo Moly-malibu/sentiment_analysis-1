@@ -8,6 +8,8 @@ import os
 import emcee
 import scipy.optimize as op
 import corner
+import statsmodels.api as sm
+
 
 
 def compute_correlation_posteriors(pos_scale,neg_scale,sentiment_curve_scaling,sentiment_scaling_Xmin,sentiment_scaling_Xmax, remove_outliers,target_car,thresholds,N_conv_min,N_conv_max,N_mcmc_burn,N_mcmc_walkers,N_mcmc_runs,N_correlation_samples):
@@ -279,6 +281,14 @@ def compute_correlation_posteriors(pos_scale,neg_scale,sentiment_curve_scaling,s
 	corr_ytrue_neg=[]
 	N_vals =[]
 	
+	# Let us print the classical fitting statistics
+	print('===============================================================================')
+	print('Summary Statistics Univariate: ', target_car)
+	model= classical_linear_fit_1D(x3,y,'S_and_P_500')
+	print('===============================================================================')
+	print('Summary Statistics Multivariate: ', target_car)
+	model= classical_linear_fit_3D(x1,x2,x3,y)
+	print('===============================================================================')
 	# Here we test that the Nmax is not too large compared to available array dimensions
 	if(N_conv_max > len(daily_return_sp500)):
 		print('Specified Nmax is greater than Dim of Sentiment Array: ')
@@ -409,16 +419,80 @@ def compute_correlation_posteriors(pos_scale,neg_scale,sentiment_curve_scaling,s
 	plt.savefig("data/"+target_car+"/"+target_car+"_corr_M_convergence.pdf",bbox_inches="tight")
 	
 	return None
+
+
+def classical_linear_fit_3D(x1,x2,x3,y):
+	'''
+	This function conducts the normal linear regression fit with all statistics
 	
+	x1 = y_tp
+	x2 = y_tn
+	x3 = daily_return_sp500
+	'''
+	df = pd.DataFrame()
+	df['Pos_sentiment'] = x1
+	df['Neg_sentiment'] = x2
+	df['Market_returns'] = x3
 	
+	#  xy = sm.add_constant(x if y is None else pd.concat([x, y], axis=1))
+	X = df[['Pos_sentiment','Neg_sentiment','Market_returns']]
+	X = sm.add_constant(X) # adding a constant
 	
+	model = sm.OLS(y,X).fit()
+	print_model = model.summary()
+	print(print_model)
+
+	return model
+
+def classical_linear_fit_1D(x,y,data_label):
+	'''
+	This function conducts the normal linear regression fit with all statistics
+	input x: 
+	input y:
+	data_label: The name of the 'x_variable'
+	'''
+	df = pd.DataFrame()
+	df[data_label] = x
+	
+	#  xy = sm.add_constant(x if y is None else pd.concat([x, y], axis=1))
+	X = df[[data_label]]
+	X = sm.add_constant(X) # adding a constant
+	
+	model = sm.OLS(y,X).fit()
+	print_model = model.summary()
+	print(print_model)
+	
+	return model
+	
+def classical_linear_fit_2D(x1,x2,y):
+	'''
+	This function conducts the normal linear regression fit with all statistics
+	'''
+	df = pd.DataFrame()
+	df['x1'] = x1
+	df['x2'] = x2
+	
+	#  xy = sm.add_constant(x if y is None else pd.concat([x, y], axis=1))
+	X = df[['x1','x2']]
+	X = sm.add_constant(X) # adding a constant
+	
+	model = sm.OLS(y,X).fit()
+	print_model = model.summary()
+	print(print_model)
+	#xy = sm.add_constant(x if y is None else df.concat([x, y], axis=1))
+	#res = sm.OLS(xy.ix[:, -1], xy.ix[:, :-1], missing='drop').fit()
+	#if show: print res.summary()
+	
+	return model	
 def fit_model(x1,x2,x3,y,N,N_mcmc_walkers,N_mcmc_runs,N_mcmc_burn,target_car,b1_scale,b2_scale):
 	'''
+	This code fits the multilinear model
+	
 	x1 = y_tp
 	x2 = y_tn
 	x3 = daily_return_sp500
 	y = daily_return_target_car
-	N: Number of data points used for fitting
+	N: Number of data points used for fitting (less than len(y))
 	'''
 	
 	x1 = x1[0:N]
@@ -578,27 +652,27 @@ def fit_model(x1,x2,x3,y,N,N_mcmc_walkers,N_mcmc_runs,N_mcmc_burn,target_car,b1_
                              zip(*np.percentile(samples, [16, 50, 84,2,98],
                                                 axis=0)))
 
-	print("====================================================\n")
-	print("Parameter estimation for: "+ target_car+"\n")
-	print("The number of Data Points is : ", N,'\n')
+	#print("====================================================\n")
+	#print("Parameter estimation for: "+ target_car+"\n")
+	#print("The number of Data Points is : ", N,'\n')
 	
-	print("The 68% Confidence regions")
-	print("a_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(a_mcmc[0],a_mcmc[1],a_mcmc[2]))
-	print("bP_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b1_mcmc[0],b1_mcmc[1],b1_mcmc[2]))
-	print("bN_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b2_mcmc[0],b2_mcmc[1],b2_mcmc[2]))
-	print("bM_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b3_mcmc[0],b3_mcmc[1],b3_mcmc[2]))
-	print("sigma_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(sigma_mcmc[0],sigma_mcmc[1],sigma_mcmc[2]))
+	#print("The 68% Confidence regions")
+	#print("a_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(a_mcmc[0],a_mcmc[1],a_mcmc[2]))
+	#print("bP_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b1_mcmc[0],b1_mcmc[1],b1_mcmc[2]))
+	#print("bN_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b2_mcmc[0],b2_mcmc[1],b2_mcmc[2]))
+	#print("bM_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b3_mcmc[0],b3_mcmc[1],b3_mcmc[2]))
+	#print("sigma_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(sigma_mcmc[0],sigma_mcmc[1],sigma_mcmc[2]))
 	
-	print("\n")
-	print("The 96% Confidence regions")
-	print("a_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(a_mcmc[0],a_mcmc[3],a_mcmc[4]))
-	print("bP_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b1_mcmc[0],b1_mcmc[3],b1_mcmc[4]))
-	print("bN_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b2_mcmc[0],b2_mcmc[3],b2_mcmc[4]))
-	print("bM_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b3_mcmc[0],b3_mcmc[3],b3_mcmc[4]))
-	print("sigma_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(sigma_mcmc[0],sigma_mcmc[3],sigma_mcmc[4]),"\n")
+	#print("\n")
+	#print("The 96% Confidence regions")
+	#print("a_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(a_mcmc[0],a_mcmc[3],a_mcmc[4]))
+	#print("bP_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b1_mcmc[0],b1_mcmc[3],b1_mcmc[4]))
+	#print("bN_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b2_mcmc[0],b2_mcmc[3],b2_mcmc[4]))
+	#print("bM_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(b3_mcmc[0],b3_mcmc[3],b3_mcmc[4]))
+	#print("sigma_mcmc = %.04f ^{+%0.03f}_{-%0.03f}"%(sigma_mcmc[0],sigma_mcmc[3],sigma_mcmc[4]),"\n")
 	
-	print("Correlation between B1 and B2:", np.corrcoef(samples[:,1], (samples[:,2]))[0,1])
-	print("====================================================\n")
+	#print("Correlation between B1 and B2:", np.corrcoef(samples[:,1], (samples[:,2]))[0,1])
+	#print("====================================================\n")
 	
 	#=============================================================================================
 	# Residual plots
@@ -607,8 +681,8 @@ def fit_model(x1,x2,x3,y,N,N_mcmc_walkers,N_mcmc_runs,N_mcmc_burn,target_car,b1_
 	model = a_mcmc[0]+b1_mcmc[0]*x1+b2_mcmc[0]*x2 +b3_mcmc[0]*x3     
 	res = (y-model)
 	
-	print("residual mean: %.04f"%res.mean())
-	print("residual std: %.04f"%res.std())
+	#print("residual mean: %.04f"%res.mean())
+	#print("residual std: %.04f"%res.std())
 	
 	plt.clf()
 	plt.plot(res,"o")
@@ -692,7 +766,8 @@ def correlation_analysis(x1,x2,x3,y,samples,N,target_car,N_round=4,N_correlation
 	    overall_corr.append(pearson_corr(alpha,betaM,betaP,betaN,x1,x2,x3,y)[3])
 	
 	    
-	print('Corr(y_true,Pos): ',np.corrcoef(y,x1)[0][1])
+	#print('Corr(y_true,Pos): ',np.corrcoef(y,x1)[0][1])
+	
 	s = pos_corr
 	median, q1, q3,q4,q5 = np.percentile(s, 50), np.percentile(s, 16), np.percentile(s, 84), np.percentile(s,2),np.percentile(s,98)
 	corr_ytrue_pos = np.asarray([median,q1,q3,q4,q5])
@@ -711,7 +786,8 @@ def correlation_analysis(x1,x2,x3,y,samples,N,target_car,N_round=4,N_correlation
 	plt.title(target_car+ ' Pos Sentiment Corr. Coeff.',size=20)
 	plt.savefig("data/"+target_car+"/"+target_car+"_Pos_rho_pdf="+str(N)+".pdf",bbox_inches="tight")
 	
-	print('Corr(y_True,Neg): ',np.corrcoef(y,x2)[0][1])
+	#print('Corr(y_True,Neg): ',np.corrcoef(y,x2)[0][1])
+	
 	s = neg_corr
 	median, q1, q3,q4,q5 = np.percentile(s, 50), np.percentile(s, 16), np.percentile(s, 84), np.percentile(s,2),np.percentile(s,98)
 	corr_ytrue_neg = np.asarray([median,q1,q3,q4,q5])
@@ -730,7 +806,8 @@ def correlation_analysis(x1,x2,x3,y,samples,N,target_car,N_round=4,N_correlation
 	plt.title(target_car+ ' Neg Sentiment Corr. Coeff.',size=20)
 	plt.savefig("data/"+target_car+"/"+target_car+"_Neg_rho_pdf="+str(N)+".pdf",bbox_inches="tight")
 	
-	print('Corr(y_true,Market): ',np.corrcoef(y,x3)[0][1])
+	#print('Corr(y_true,Market): ',np.corrcoef(y,x3)[0][1])
+	
 	s = market_corr
 	median, q1, q3,q4,q5 = np.percentile(s, 50), np.percentile(s, 16), np.percentile(s, 84), np.percentile(s,2),np.percentile(s,98)
 	corr_ytrue_market = np.asarray([median,q1,q3,q4,q5])
@@ -751,4 +828,3 @@ def correlation_analysis(x1,x2,x3,y,samples,N,target_car,N_round=4,N_correlation
 	
 	
 	return corr_ytrue_market,corr_ytrue_pos,corr_ytrue_neg
-	

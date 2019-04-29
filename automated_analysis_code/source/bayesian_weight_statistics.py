@@ -1,3 +1,11 @@
+'''
+This code combines the sentiment models using Bayesian weights
+'''
+
+
+
+
+
 import warnings
 import numpy as np
 
